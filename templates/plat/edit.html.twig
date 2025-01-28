@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Plat
+{% endblock %}
+
+{% block body %}
+	<h1>Edit Plat</h1>
+
+	{{ form_start(form) }}
+	<div>
+		{{ form_row(form.nom) }}
+		{{ form_row(form.prix) }}
+		{{ form_row(form.tempsCuisson) }}
+	</div>
+
+	<h3>Ingredients</h3>
+	<ul class="platIngredients" data-prototype="{{ form_widget(form.platIngredients.vars.prototype)|e('html_attr') }}">
+		{% for platIngredient in form.platIngredients %}
+			<li>
+				{{ form_row(platIngredient.ingredient) }}
+				{{ form_row(platIngredient.quantity) }}
+				<button type="button" class="btn btn-danger remove-ingredient">Remove</button>
+			</li>
+		{% endfor %}
+	</ul>
+
+	<button type="button" class="add-ingredient btn btn-primary">Add Ingredient</button>
+
+	<button type="submit" class="btn btn-success">Save</button>
+	{{ form_end(form) }}
+
+	<a href="{{ path('app_plat_index') }}">back to list</a>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const addIngredientButton = document.querySelector('.add-ingredient');
+const ingredientList = document.querySelector('ul.platIngredients');
+
+addIngredientButton.addEventListener('click', function () {
+const prototype = ingredientList.dataset.prototype;
+const index = ingredientList.children.length;
+const newForm = prototype.replace(/__name__/g, index);
+
+const newFormItem = document.createElement('li');
+newFormItem.innerHTML = newForm;
+
+// Add a remove button
+const removeButton = document.createElement('button');
+removeButton.type = 'button';
+removeButton.innerText = 'Remove';
+removeButton.classList.add('btn', 'btn-danger', 'remove-ingredient');
+removeButton.addEventListener('click', function () {
+newFormItem.remove();
+});
+
+newFormItem.appendChild(removeButton);
+ingredientList.appendChild(newFormItem);
+});
+
+// Add remove functionality to existing ingredient fields
+document.querySelectorAll('.remove-ingredient').forEach(function (button) {
+button.addEventListener('click', function () {
+button.closest('li').remove();
+});
+});
+});
+	</script>
+{% endblock %}
