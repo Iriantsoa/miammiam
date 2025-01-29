@@ -27,9 +27,16 @@ class Ingredient
     #[ORM\OneToMany(targetEntity: PlatIngredient::class, mappedBy: 'ingredient', orphanRemoval: true)]
     private Collection $platIngredients;
 
+    /**
+     * @var Collection<int, Stock>
+     */
+    #[ORM\OneToMany(targetEntity: Stock::class, mappedBy: 'ingredient', orphanRemoval: true)]
+    private Collection $stocks;
+
     public function __construct()
     {
         $this->platIngredients = new ArrayCollection();
+        $this->stocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -85,6 +92,36 @@ class Ingredient
             // Set the owning side to null (unless already changed)
             if ($platIngredient->getIngredient() === $this) {
                 $platIngredient->setIngredient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Stock>
+     */
+    public function getStocks(): Collection
+    {
+        return $this->stocks;
+    }
+
+    public function addStock(Stock $stock): static
+    {
+        if (!$this->stocks->contains($stock)) {
+            $this->stocks->add($stock);
+            $stock->setIngredient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStock(Stock $stock): static
+    {
+        if ($this->stocks->removeElement($stock)) {
+            // set the owning side to null (unless already changed)
+            if ($stock->getIngredient() === $this) {
+                $stock->setIngredient(null);
             }
         }
 
