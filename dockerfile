@@ -34,14 +34,18 @@ USER symfony-user
 COPY . .
 
 # Install Composer dependencies (optimized for production)
-RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+RUN composer install --no-dev --optimize-autoloader
 
 # Switch back to root for Apache setup
 USER root
 
 # Set the right permissions for the Apache server
 RUN chown -R www-data:www-data /var/www/html/public
+RUN chown -R www-data:www-data /var/www/html/var
+RUN chown -R www-data:www-data /var/www/html/vendor
 RUN chmod -R 755 /var/www/html/public
+RUN chmod -R 755 /var/www/html/var
+RUN chmod -R 755 /var/www/html/vendor
 
 # Enable Apache rewrite module
 RUN a2enmod rewrite
@@ -50,13 +54,11 @@ RUN a2enmod rewrite
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
 # Configure Apache to allow overrides and proper permissions
-RUN echo '<Directory /var/www/html/public>' >> /etc/apache2/apache2.conf && \
-    echo '    AllowOverride All' >> /etc/apache2/apache2.conf && \
-    echo '    Require all granted' >> /etc/apache2/apache2.conf && \
-    echo '</Directory>' >> /etc/apache2/apache2.conf
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 # Expose port 80
-EXPOSE 9000
+EXPOSE 80
 
 # Start Apache
 CMD ["apache2-foreground"]
