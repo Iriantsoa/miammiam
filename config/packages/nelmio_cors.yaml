@@ -1,0 +1,13 @@
+nelmio_cors:
+  defaults:
+    allow_credentials: false
+    allow_origin: ["*"] # You can restrict this to specific domains later
+    allow_headers: ["Content-Type", "Authorization"]
+    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    expose_headers: []
+    max_age: 3600
+  paths:
+    "^/api/": # You can restrict the CORS rules to specific routes
+      allow_origin: ["*"] # Adjust to your specific needs
+      allow_headers: ["Content-Type", "Authorization"]
+      allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
