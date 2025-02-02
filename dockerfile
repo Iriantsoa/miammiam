@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -24,13 +25,13 @@ RUN docker-php-ext-install \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy the Symfony project files
-COPY . .
-
 # Create a non-root user and switch to it
 RUN useradd -m symfony-user
 RUN chown -R symfony-user:symfony-user /var/www/html
 USER symfony-user
+
+# Copy the Symfony project files
+COPY . .
 
 # Install Composer dependencies (optimized for production)
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
@@ -41,11 +42,11 @@ USER root
 # Set permissions for Symfony cache and logs
 RUN chown -R www-data:www-data var/
 
-# Clear Symfony cache (optional, but recommended)
-RUN php bin/console cache:clear
-
 # Enable Apache rewrite module
 RUN a2enmod rewrite
+
+# Set the document root to Symfony's public directory
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
 # Expose port 80
 EXPOSE 80
