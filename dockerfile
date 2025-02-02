@@ -56,7 +56,7 @@ RUN echo '<Directory /var/www/html/public>' >> /etc/apache2/apache2.conf && \
     echo '</Directory>' >> /etc/apache2/apache2.conf
 
 # Expose port 80
-EXPOSE 80
+EXPOSE 9000
 
 # Start Apache
 CMD ["apache2-foreground"]
