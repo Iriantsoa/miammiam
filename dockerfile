@@ -39,8 +39,9 @@ RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 # Switch back to root for Apache setup
 USER root
 
-# Set permissions for Symfony cache and logs
-RUN chown -R www-data:www-data var/ public/
+# Set the right permissions for the Apache server
+RUN chown -R www-data:www-data /var/www/html/public
+RUN chmod -R 755 /var/www/html/public
 
 # Enable Apache rewrite module
 RUN a2enmod rewrite
