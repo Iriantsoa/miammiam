@@ -57,6 +57,13 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# Allow directory indexing for the public directory
+RUN echo '<Directory /var/www/html/public>' >> /etc/apache2/apache2.conf && \
+    echo '    AllowOverride All' >> /etc/apache2/apache2.conf && \
+    echo '    Require all granted' >> /etc/apache2/apache2.conf && \
+    echo '    DirectoryIndex index.php' >> /etc/apache2/apache2.conf && \
+    echo '</Directory>' >> /etc/apache2/apache2.conf
+
 # Expose port 8080
 EXPOSE 8080
 
