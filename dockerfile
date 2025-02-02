@@ -27,8 +27,16 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy the Symfony project files
 COPY . .
 
+# Create a non-root user and switch to it
+RUN useradd -m symfony-user
+RUN chown -R symfony-user:symfony-user /var/www/html
+USER symfony-user
+
 # Install Composer dependencies (optimized for production)
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+
+# Switch back to root for Apache setup
+USER root
 
 # Set permissions for Symfony cache and logs
 RUN chown -R www-data:www-data var/
